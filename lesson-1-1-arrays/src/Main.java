@@ -6,7 +6,6 @@ public class Main {
         exercise5();
     }
 
-
     public static int getInt(String message) {
         System.out.print(message);
         return Integer.parseInt(reader.nextLine());
