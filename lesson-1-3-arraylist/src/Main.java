@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class Main {
@@ -12,11 +9,11 @@ public class Main {
         try {
             return Integer.parseInt(reader.nextLine());
         } catch (Exception e) {
-            return None;
+            return null;
         }
     }
 
-    public ArrayList<Integer> getIntList() {
+    public static ArrayList<Integer> getIntList() {
         ArrayList<Integer> list = new ArrayList<>();
 
         while (true) {
@@ -29,7 +26,7 @@ public class Main {
         }
     }
 
-    public int greatest(ArrayList<Integer> list) {
+    public static int greatest(ArrayList<Integer> list) {
         int greatest = list.get(0);
 
         for (int i : list) {
@@ -41,7 +38,7 @@ public class Main {
         return greatest;
     }
 
-    public int sum(ArrayList<Integer> list) {
+    public static int sum(ArrayList<Integer> list) {
         int total = 0;
 
         for (int i : list) {
@@ -51,11 +48,11 @@ public class Main {
         return total;
     }
 
-    public double average(ArrayList<Integer> list) {
+    public static double average(ArrayList<Integer> list) {
         return sum(list) / (double) list.size();
     }
 
-    public double median(ArrayList<Integer> list) {
+    public static double median(ArrayList<Integer> list) {
         Collections.sort(list);
 
         if (list.size() % 2 == 0) {
@@ -65,14 +62,15 @@ public class Main {
         }
     }
 
-    public double variance(ArrayList<Integer> list) {
+    public static double variance(ArrayList<Integer> list) {
         double average = average(list);
-        double variance = list.stream().map(elem -> Math.pow(elem - average, 2));
+        double unweightedVariance = list.stream().mapToDouble(elem -> Math.pow(elem - average, 2)).sum();
+
+        return unweightedVariance / (list.size() - 1);
     }
 
     public static void main(String[] args) {
-        Integer[] ints = {1, 2, 3};
-        Number[] nums = ints;
-        nums[0] = 0.0;
+        ArrayList data = new ArrayList<>(List.of(10, 12, 7, 8));
+        System.out.println(variance(data));
     }
 }
