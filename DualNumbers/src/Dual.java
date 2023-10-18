@@ -1,10 +1,7 @@
 public class Dual {
     private double real;
     private double epsilon;
-    private static final MAX_RELATIVE_FLOATING_DIFF = Double.FLT
-    public Dual() {
-        this(0, 0);
-    }
+    private static final double MAX_RELATIVE_DIFFERENCE = 1E-7;
     public Dual(double real) {
         this(real, 0);
     }
@@ -42,7 +39,7 @@ public class Dual {
     public Dual pow(double power) {
         return new Dual(
                 Math.pow(real, power),
-                power * Math.pow(epsilon, power - 1)
+                power * Math.pow(real, power - 1) * epsilon
         );
     }
     public Dual exp(double base) {
@@ -63,10 +60,10 @@ public class Dual {
     // https://randomascii.wordpress.com/2012/02/25/comparing-floating-point-numbers-2012-edition/#:~:text=The%20idea%20of%20a%20relative,fabs(f1%2Df2).
     private static boolean doubleEquals(double a, double b) {
         double diff = Math.abs(a - b);
-        float largest = Math.max(Math.abs(a), Math.abs(b));
-        return diff <= largest * MAX_RELATIVE_FLOATING_DIFF;
+        double largest = Math.max(Math.abs(a), Math.abs(b));
+        return diff <= largest * MAX_RELATIVE_DIFFERENCE;
     }
     public boolean equals(Dual other) {
-
+        return doubleEquals(this.real, other.real) && doubleEquals(this.epsilon, other.epsilon);
     }
 }
