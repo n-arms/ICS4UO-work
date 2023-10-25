@@ -1,0 +1,79 @@
+--Creating two Employee instances...
+
+Employee Information:
+ Name: Alan T
+ ID: 12AX5
+ Salary: $80000
+ Sick Days: 1
+
+Employee Information:
+ Name: Donald K
+ ID: 12AX6
+ Salary: $0
+ Sick Days: 0
+
+--Set Donald K's salary to 90000 and give 11 sick days...
+
+Employee Information:
+ Name: Donald K
+ ID: 12AX6
+ Salary: $90000
+ Sick Days: 11
+
+--Creating an Employees instance, and adding
+--Alan and Donald and two new employees...
+--Here is the staff list...
+[
+Employee Information:
+ Name: Alan T
+ ID: 12AX5
+ Salary: $80000
+ Sick Days: 1,
+Employee Information:
+ Name: Donald K
+ ID: 12AX6
+ Salary: $90000
+ Sick Days: 11,
+Employee Information:
+ Name: Grace H
+ ID: 12AX7
+ Salary: $85000
+ Sick Days: 8,
+Employee Information:
+ Name: Shafi G
+ ID: 12AX8
+ Salary: $99000
+ Sick Days: 12]
+
+--Remove Donald...
+Employee Donald K has been removed.
+--Try to remove 12AX0...
+12AX0 is not an employee.
+
+--Use two sick days for Alan...
+Alan T used a sick day.
+Alan T does not have enough sick days.
+--Alan's sick days left: 0
+--Try to use a sick day for Monty P...
+Monty P is not an employee.
+--Give Shafi a raise of $10000...
+12AX8 new salary: $109000
+--Try to give Linus a raise of $1...
+Linus T is not an employee.
+--The final staff list...
+[
+Employee Information:
+ Name: Alan T
+ ID: 12AX5
+ Salary: $80000
+ Sick Days: 0,
+Employee Information:
+ Name: Grace H
+ ID: 12AX7
+ Salary: $85000
+ Sick Days: 8,
+Employee Information:
+ Name: Shafi G
+ ID: 12AX8
+ Salary: $109000
+ Sick Days: 12]
