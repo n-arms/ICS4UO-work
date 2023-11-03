@@ -4,6 +4,7 @@ public class Course {
     private String name;
     private String code;
     private ArrayList<Student> students;
+    private int assignments = 0;
     public Course(String name, String code, ArrayList<Student> students) {
         this.name = name;
         this.code = code;
@@ -33,5 +34,13 @@ public class Course {
     public void removeStudent(String nameOrNumber) {
         Student s = getStudent(nameOrNumber);
         students.remove(s);
+    }
+    public int getAssignments() {
+        return assignments;
+    }
+    public void printStudents() {
+        for (Student s : students) {
+            System.out.printf("%s%n", s);
+        }
     }
 }
