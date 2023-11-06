@@ -31,9 +31,8 @@ public class Course {
         }
         students.add(updated);
     }
-    public void removeStudent(String nameOrNumber) {
-        Student s = getStudent(nameOrNumber);
-        students.remove(s);
+    public void removeStudent(Student toRemove) {
+        students.remove(toRemove);
     }
     public int getAssignments() {
         return assignments;
@@ -42,5 +41,17 @@ public class Course {
         for (Student s : students) {
             System.out.printf("%s%n", s);
         }
+    }
+    public ArrayList<Student> getStudents() {
+        return students;
+    }
+
+    public void printAssignment(int assignment) {
+        for (Student s : students) {
+            System.out.printf("%s: %d%%%n", s, s.getMark(assignment));
+        }
+    }
+    public void setMark(int student, int assignment, int mark) {
+        students.get(student).editMark(assignment, mark);
     }
 }

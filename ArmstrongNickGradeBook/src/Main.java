@@ -47,6 +47,9 @@ public class Main {
             }
         });
     }
+    public static int getMark() {
+        return getIntInRange("Enter a mark or -1 for a no mark: ", -1, 100);
+    }
     public static void waitForInput() {
         getValue("Press enter to continue.", null, x -> 0);
     }
@@ -123,13 +126,142 @@ public class Main {
         return Main::topMenu;
     }
     private static Menu deleteStudentMenu() {
-        return null;
+        course.printStudents();
+        Student toRemove = getStudent();
+
+        course.removeStudent(toRemove);
+
+        return Main::topMenu;
     }
     private static Menu editStudentMarkMenu() {
-        return null;
+        course.printStudents();
+        Student toEdit = getStudent();
+        toEdit.printMarks();
+
+        System.out.println("1) Edit all marks");
+        System.out.println("2) Edit some marks");
+        System.out.println("0) Back");
+
+        int action = getIntInRange("Enter an action: ", 0, 2);
+
+        switch (action) {
+            case 1:
+                return () -> editStudentAllMarksMenu(toEdit);
+            case 2:
+                return () -> editStudentSomeMarksMenu(toEdit);
+            case 0:
+                return Main::topMenu;
+            default:
+                throw new AssertionError("Only numbers in the range [0, 2] should get past input validation");
+        }
+    }
+    private static Menu editStudentAllMarksMenu(Student toEdit) {
+        System.out.println("Old Marks:");
+        toEdit.printMarks();
+
+        for (int i = 0; i < toEdit.getMarks().size(); i++) {
+            int newMark = getMark();
+            toEdit.editMark(i, newMark);
+        }
+
+        return Main::topMenu;
+    }
+    private static Menu editStudentSomeMarksMenu(Student toEdit) {
+        System.out.println("Old Marks:");
+        toEdit.printMarks();
+
+        int action;
+        do {
+            System.out.println("1) Edit a mark");
+            System.out.println("0) Back");
+            action = getIntInRange("", 0, 1);
+
+            if (action == 1) {
+                int assignment = getIntInRange("Which mark # do you wish to change: ", 0, toEdit.getMarks().size() - 1);
+                int mark = getMark();
+                toEdit.editMark(assignment, mark);
+            }
+        } while  (action != 0);
+
+        System.out.println("New Marks:");
+        toEdit.printMarks();
+
+        return Main::topMenu;
     }
     private static Menu assignmentMenu() {
-        return null;
+        System.out.println("1) Edit marks for an assignment");
+        System.out.println("2) Add an assignment");
+        System.out.println("3) Delete an assignment");
+        System.out.println("0) Exit");
+
+        int action = getIntInRange("Enter an action: ", 0, 3);
+
+        switch (action) {
+            case 1:
+                return editAssignmentMarkMenu();
+            case 2:
+                return addAssignmentMenu();
+            case 3:
+                return deleteAssignmentMenu();
+            case 0:
+                return Main::topMenu;
+            default:
+                throw new AssertionError("Only numbers in the range [0, 2] should get past input validation");
+        }
+    }
+    private static Menu editAssignmentMarkMenu() {
+        course.printAssignments();
+
+        int assignment = getIntInRange("Enter the assignment to edit: ", 0, course.getAssignments() - 1);
+
+        System.out.println("1) Edit all marks for an assignment");
+        System.out.println("2) Edit some marks for an assignment");
+        System.out.println("0) Exit");
+
+        int action = getIntInRange("Enter an action: ", 0, 2);
+
+        switch (action) {
+            case 1:
+                return () -> editAssignmentAllMarksMenu(assignment);
+            case 2:
+                return () -> editAssignmentSomeMarksMenu(assignment);
+            case 0:
+                return Main::topMenu;
+            default:
+                throw new AssertionError("Only numbers in the range [0, 2] should get past input validation");
+        }
+    }
+    private static Menu editAssignmentAllMarksMenu(int assignment) {
+        course.printAssignment(assignment);
+
+        for (Student s : course.getStudents()) {
+            System.out.printf("The old mark for %s was %d%%.%n", s, s.getMark(assignment));
+            int newMark = getMark();
+            s.editMark(assignment, newMark);
+        }
+
+        return Main::topMenu;
+    }
+    private static Menu editAssignmentSomeMarksMenu(int assignment) {
+        course.printAssignment(assignment);
+
+        int action;
+        do {
+            System.out.println("1) Edit a mark");
+            System.out.println("0) Exit");
+
+            action = getIntInRange("Enter an action: ", 0, 1);
+
+            if (action == 1) {
+                int student = getIntInRange("Enter the mark # to edit", 0, course.getStudents().size() - 1);
+                int newMark = getMark();
+                course.setMark(student, assignment, newMark);
+            }
+        } while (action != 0);
+
+        course.printAssignment(assignment);
+
+        return Main::topMenu;
     }
     private static Menu printMenu() {
         return null;
