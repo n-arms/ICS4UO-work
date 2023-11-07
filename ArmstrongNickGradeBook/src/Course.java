@@ -15,7 +15,7 @@ public class Course {
     }
     public Student getStudent(String nameOrNumber) {
         for (Student s : students) {
-            if (s.getName() == nameOrNumber || s.getName() == nameOrNumber) {
+            if (s.getName().equals(nameOrNumber) || s.getNumber().equals(nameOrNumber)) {
                 return s;
             }
         }
@@ -53,5 +53,17 @@ public class Course {
     }
     public void setMark(int student, int assignment, int mark) {
         students.get(student).editMark(assignment, mark);
+    }
+    public void addAssignment(ArrayList<Integer> marks) {
+        for (int i = 0; i < students.size(); i++) {
+            students.get(i).addMark(marks.get(i));
+        }
+    }
+    public void deleteAssignment(int assignment) {
+        for (Student s : students) {
+            s.deleteAssignment(assignment);
+        }
+    }
+    public double average() {
     }
 }

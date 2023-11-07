@@ -263,8 +263,102 @@ public class Main {
 
         return Main::topMenu;
     }
+    private static Menu addAssignmentMenu() {
+        course.printStudents();
+        ArrayList<Integer> marks = new ArrayList<>();
+
+        for (int i = 0; i < course.getStudents().size(); i++) {
+            System.out.printf("Student %d. ", i);
+            int mark = getMark();
+            marks.add(mark);
+        }
+
+        course.addAssignment(marks);
+
+        course.printAssignment(course.getAssignments() - 1);
+
+        return Main::topMenu;
+    }
+    private static Menu deleteAssignmentMenu() {
+        course.printStudents();
+
+        int assignment = getIntInRange("Enter the assignment you wish to delete or -1 to exit: ", -1, course.getAssignments() - 1);
+
+        if (assignment != -1) {
+            course.deleteAssignment(assignment);
+        }
+
+        return Main::topMenu;
+    }
     private static Menu printMenu() {
-        return null;
+        System.out.println("1) Calculate course average");
+        System.out.println("2) Calculate assignment averages");
+        System.out.println("3) Calculate student averages");
+        System.out.println("4) Print student list");
+        System.out.println("5) Print assignment marks");
+        System.out.println("6) Print student marks");
+        System.out.println("0) Back");
+
+        int action = getIntInRange("Enter an action: ", 0, 6);
+
+        switch (action) {
+            case 1:
+                return Main::courseAverageMenu;
+            case 2:
+                return Main::assignmentAverageMenu;
+            case 3:
+                return Main::studentAverageMenu;
+            case 4:
+                return Main::studentListMenu;
+            case 5:
+                return Main::assignmentMarkMenu;
+            case 6:
+                return Main::studentMarkMenu;
+            case 0:
+                return Main::topMenu;
+            default:
+                throw new AssertionError("Only numbers in the range [0, 6] should get past input validation");
+        }
+    }
+    public static Menu courseAverageMenu() {
+        System.out.println(course);
+        System.out.printf("The course average is %f%%.%n", course.average());
+
+        return Main::topMenu;
+    }
+    public static Menu assignmentAverageMenu() {
+        System.out.println("1) Print some assignment averages");
+        System.out.println("2) Print all assignment averages");
+        System.out.println("0) Exit");
+
+        int action = getIntInRange("Enter an action", 0, 2);
+
+        switch (action) {
+            case 1:
+                return Main::printSomeAssignmentAveragesMenu;
+            case 2:
+                return Main::printAllAssignmentAveragesMenu;
+            case 0:
+                return Main::topMenu;
+            default:
+                throw new AssertionError("Only numbers in the range [0, 2] should get past input validation");
+        }
+    }
+    public static Menu printSomeAssignmentAveragesMenu() {
+        int action;
+        do {
+            System.out.println("1) Print an assignment average");
+            System.out.println("0) Exit");
+
+            action = getIntInRange("Enter an action: ", 0, 1);
+
+            if (action == 1) {
+                int assignment = getIntInRange("Enter the assignment to print: ", 0, course.getAssignments() - 1);
+                System.out.printf("The average for assignment %d is %f%%%n", assignment, course.assignmentAverage(assignment));
+            }
+        } while (action != 0);
+
+        return Main::topMenu;
     }
     public static void main(String[] args) {
         Menu current = Main::topMenu;
