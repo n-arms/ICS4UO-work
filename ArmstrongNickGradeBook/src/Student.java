@@ -1,15 +1,16 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.OptionalDouble;
 
 public class Student {
     private String name;
     private String number;
     private ArrayList<Integer> marks;
-    public Student(String name, String number, ArrayList<Integer> marks) {
+    public Student(String name, String number, Collection<? extends Integer> marks) {
         this.name = name;
         this.number = number;
-        this.marks = marks;
+        this.marks = new ArrayList<>(marks);
     }
     public String getName() {
         return name;

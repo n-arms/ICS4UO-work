@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.function.Function;
 
@@ -22,7 +23,7 @@ public class Main {
         }
     }
     public static int getInt() {
-        return getValue("Enter an integer: ", "Invalid input.", line -> Integer.parseInt(line));
+        return getValue("Enter an integer: ", "Invalid input.", Integer::parseInt);
     }
     public static int getIntInRange(String prompt, int low, int high) {
         return getValue(prompt, "Invalid input.", line -> {
@@ -110,7 +111,7 @@ public class Main {
             int mark = getIntInRange(prompt,-1, 100);
             marks.add(mark);
         }
-        course.addOrEditStudent(new Student(name, number, marks));
+        course.addStudent(new Student(name, number, marks));
         return Main::topMenu;
     }
     public static Menu editStudentMenu() {
@@ -331,7 +332,7 @@ public class Main {
         System.out.println("2) Print all assignment averages");
         System.out.println("0) Exit");
 
-        int action = getIntInRange("Enter an action", 0, 2);
+        int action = getIntInRange("Enter an action:", 0, 2);
 
         switch (action) {
             case 1:
@@ -360,7 +361,115 @@ public class Main {
 
         return Main::topMenu;
     }
+    public static Menu printAllAssignmentAveragesMenu() {
+        for (int i = 0; i < course.getAssignments(); i++) {
+            System.out.printf("The average for assignment %d is %f%%%n", i, course.assignmentAverage(i));
+        }
+
+        return Main::topMenu;
+    }
+    public static Menu studentAverageMenu() {
+        System.out.println("1) Print some student averages");
+        System.out.println("2) Print all student averages");
+        System.out.println("0) Exit");
+
+        int action = getIntInRange("Enter an action: ", 0, 2);
+
+        switch (action) {
+            case 1:
+                return Main::printSomeStudentAveragesMenu;
+            case 2:
+                return Main::printAllStudentAveragesMenu;
+            case 0:
+                return Main::topMenu;
+            default:
+                throw new AssertionError("Only numbers in the range [0, 2] should get past input validation");
+        }
+    }
+    public static Menu printSomeStudentAveragesMenu() {
+        int action;
+        do {
+            System.out.println("1) Print a student average");
+            System.out.println("0) Exit");
+
+            action = getIntInRange("Enter an action: ", 0, 1);
+
+            if (action == 1) {
+                Student toPrint = getStudent();
+                System.out.printf("The average of student %s is %f%%%n", toPrint, toPrint.average());
+            }
+        } while (action != 0);
+
+        return Main::topMenu;
+    }
+    public static Menu printAllStudentAveragesMenu() {
+        for (Student s : course.getStudents()) {
+            System.out.printf("The average of student %s is %f%%%n", s, s.average());
+        }
+
+        return Main::topMenu;
+    }
+    public static Menu studentListMenu() {
+        System.out.println("1) Print student names and averages");
+        System.out.println("2) Print student names, numbers, and averages");
+        System.out.println("0) Exit");
+
+        int action = getIntInRange("Enter an action: ", 0, 2);
+        boolean printStudentNumbers;
+
+        switch (action) {
+            case 1:
+                printStudentNumbers = false;
+                break;
+            case 2:
+                printStudentNumbers = true;
+                break;
+            case 0:
+                return Main::topMenu;
+            default:
+                throw new AssertionError("Only numbers in the range [0, 2] should get past input validation");
+        }
+
+        course.printStudentList(printStudentNumbers);
+
+        return Main::topMenu;
+    }
+    public static Menu assignmentMarkMenu() {
+        course.printAssignments();
+
+        int assignment = getIntInRange("Enter an assignment #: ", 0, course.getAssignments() - 1);
+
+        for (Student s : course.getStudents()) {
+            int mark = s.getMark(assignment);
+            if (mark != -1) {
+                System.out.printf("Student %s got a %d%%%n", s.getName(), mark);
+            }
+        }
+
+        return Main::topMenu;
+    }
+    public static Menu studentMarkMenu() {
+        course.printStudents();
+
+        Student toPrint = getStudent();
+        ArrayList<Integer> marks = toPrint.getMarks();
+
+        for (int i = 0; i < marks.size(); i++) {
+            int mark = marks.get(i);
+            if (mark != -1) {
+                System.out.printf("Assignment %d. %d%%%n", i, mark);
+            }
+        }
+
+        return Main::topMenu;
+    }
     public static void main(String[] args) {
+        course.addStudent(new Student("Alan T", "110101011", List.of(83, 71, 76, 91, 85)));
+        course.addStudent(new Student("Donald K", "314159265", List.of(84, 90, 88, 99, 80)));
+        course.addStudent(new Student("Albert E", "299792458", List.of(93, 65, 95, 40, 19)));
+        course.addStudent(new Student("Marie C", "002661600", List.of(76, 52, 96, 92, 66)));
+        course.addStudent(new Student("Ada L", "018151210", List.of(91, 98, 89, 99, 99)));
+
         Menu current = Main::topMenu;
 
         while (current != null) {

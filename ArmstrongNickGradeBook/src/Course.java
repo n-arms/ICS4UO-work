@@ -21,15 +21,15 @@ public class Course {
         }
         return null;
     }
-    public void addOrEditStudent(Student updated) {
-        Student existing = getStudent(updated.getNumber());
+    public void addStudent(Student s) {
+        Student existing = getStudent(s.getNumber());
         if (existing == null) {
-            existing = getStudent(updated.getName());
+            existing = getStudent(s.getName());
         }
         if (existing != null) {
             students.remove(existing);
         }
-        students.add(updated);
+        students.add(s);
     }
     public void removeStudent(Student toRemove) {
         students.remove(toRemove);
