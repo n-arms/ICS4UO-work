@@ -1,4 +1,6 @@
+import java.sql.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.function.Function;
 
@@ -135,6 +137,10 @@ public class Main {
         return null;
     }
     public static void main(String[] args) {
+        Student[] students = {
+            new Student()
+        };
+        course = new Course("Introduction to Computer Science", "CSC100", new ArrayList<Student>(Arrays.asList(students)));
         Menu current = Main::topMenu;
 
         while (current != null) {
