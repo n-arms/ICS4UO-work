@@ -1,7 +1,9 @@
 public class Card {
+    public static final int KING_RANK = 13;
+    public static final int ACE_RANK = 1;
     private int rank;
     private Suit suit;
-    private enum Suit {
+    public enum Suit {
         Heart,
         Diamond,
         Club,
@@ -20,6 +22,7 @@ public class Card {
             rank = rankChar - '0';
         } else {
             rank = switch (rankChar) {
+                case 'A' -> 1;
                 case 'T' -> 10;
                 case 'J' -> 11;
                 case 'Q' -> 12;
