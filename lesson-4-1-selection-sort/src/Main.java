@@ -7,34 +7,55 @@ class Graph {
     public void add(int x, int y) {
         data.add(new Point(x, y));
     }
-    public void printGraph(int width, int height) {
+    public ArrayList<ArrayList<Point>> buckets(int width) {
         int minX = 0;
         int maxX = 0;
-        int minY = 0;
-        int maxY = 0;
         for (Point point : data) {
             minX = Math.min(minX, point.x);
             maxX = Math.max(maxX, point.x);
+        }
+
+        int xPerChar = (int) Math.ceil((maxX - minX) / (double) width);
+
+        ArrayList<ArrayList<Point>> buckets = new ArrayList<>();
+        for (int i = 0; i < width; i++) {
+            buckets.add(new ArrayList<>());
+        }
+
+        for (Point p : data) {
+            buckets.get((p.x - minX) / xPerChar).add(p);
+        }
+
+        return buckets;
+    }
+    public void printGraph(int width, int height) {
+        int minY = 0;
+        int maxY = 0;
+        for (Point point : data) {
             minY = Math.min(minY, point.y);
             maxY = Math.max(maxY, point.y);
         }
-        
-        int xPerChar = (maxX - minX) / width;
-        int yPerChar = (maxY - minY) / height;
-        
-        int[] values = new int[width + 1];
-        for (Point point : data) {
-            values[point.x / xPerChar] = point.y / yPerChar;
+
+        int yPerChar = (int) Math.ceil((maxY - minY) / (double) height);
+
+        int[] values = new int[width];
+        Arrays.fill(values, Integer.MAX_VALUE);
+
+        var buckets = buckets(width);
+
+        for (int i = 0; i < width; i++) {
+            values[i] = (int) buckets.get(i).stream().mapToInt(Point::y).average().orElse(Integer.MAX_VALUE);
         }
 
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                if (values[j] >= (height - i)) {
+                if (values[j] <= (height - i)) {
                     System.out.print("\033[0m ");
                 } else {
-                    System.out.println("\033[34m ");
+                    System.out.print("\033[44m ");
                 }
             }
+            System.out.println("\033[0m");
         }
     }
 }
@@ -101,6 +122,26 @@ public class Main {
             swap(array, i, swapping);
         }
     }
+    public static void bubbleSort(int[] array) {
+        int swap;
+        int sorted = array.length;
+
+        do {
+            swap = 0;
+
+            for (int i = 1; i < sorted; i++) {
+                int a = array[i - 1];
+                int b = array[i];
+                if (a > b) {
+                    swap(array, i - 1, i);
+                    swap += 1;
+                }
+            }
+
+            sorted -= 1;
+
+        } while (swap != 0);
+    }
     public static void quickSort(int[] array) {
         quickSort(array, 0, array.length - 1);
     }
@@ -160,18 +201,15 @@ public class Main {
         return array;
     }
     public static void main(String[] args) {
-        /*
-        int[] array = generateArray(120_000);
-        selectionSort(array);
-        */
-        int[] array = generateArray(20);
-        quickSort(array);
-        System.out.println(Arrays.toString(array));
 
         Graph graph = new Graph();
-        for (int i = 0; i < 100; i++) {
-            graph.add(i, i);
+        for (int i = 10; i < 10000; i += 10) {
+            long start = System.currentTimeMillis();
+            int[] array = generateArray(i);
+            bubbleSort(array);
+            graph.add(i, (int) (System.currentTimeMillis() - start));
         }
-        graph.printGraph(10, 10);
+
+        graph.printGraph(30, 10);
     }
 }
