@@ -1,64 +1,5 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Timer;
-class Graph {
-    private record Point(int x, int y) {}
-    private final ArrayList<Point> data = new ArrayList<>();
-    public void add(int x, int y) {
-        data.add(new Point(x, y));
-    }
-    public ArrayList<ArrayList<Point>> buckets(int width) {
-        int minX = 0;
-        int maxX = 0;
-        for (Point point : data) {
-            minX = Math.min(minX, point.x);
-            maxX = Math.max(maxX, point.x);
-        }
-
-        int xPerChar = (int) Math.ceil((maxX - minX) / (double) width);
-
-        ArrayList<ArrayList<Point>> buckets = new ArrayList<>();
-        for (int i = 0; i < width; i++) {
-            buckets.add(new ArrayList<>());
-        }
-
-        for (Point p : data) {
-            buckets.get((p.x - minX) / xPerChar).add(p);
-        }
-
-        return buckets;
-    }
-    public void printGraph(int width, int height) {
-        int minY = 0;
-        int maxY = 0;
-        for (Point point : data) {
-            minY = Math.min(minY, point.y);
-            maxY = Math.max(maxY, point.y);
-        }
-
-        int yPerChar = (int) Math.ceil((maxY - minY) / (double) height);
-
-        int[] values = new int[width];
-        Arrays.fill(values, Integer.MAX_VALUE);
-
-        var buckets = buckets(width);
-
-        for (int i = 0; i < width; i++) {
-            values[i] = (int) buckets.get(i).stream().mapToInt(Point::y).average().orElse(Integer.MAX_VALUE);
-        }
-
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                if (values[j] <= (height - i)) {
-                    System.out.print("\033[0m ");
-                } else {
-                    System.out.print("\033[44m ");
-                }
-            }
-            System.out.println("\033[0m");
-        }
-    }
-}
 public class Main {
     public static int smallest(int[] array) {
         int smallest = array[0];
@@ -201,15 +142,9 @@ public class Main {
         return array;
     }
     public static void main(String[] args) {
-
-        Graph graph = new Graph();
-        for (int i = 10; i < 10000; i += 10) {
-            long start = System.currentTimeMillis();
-            int[] array = generateArray(i);
-            bubbleSort(array);
-            graph.add(i, (int) (System.currentTimeMillis() - start));
-        }
-
-        graph.printGraph(30, 10);
+        long start = System.currentTimeMillis();
+        int[] array = generateArray(10_000);
+        bubbleSort(array);
+        System.out.println(Arrays.toString(array));
     }
 }
