@@ -1,10 +1,10 @@
 public class Person {
     private String name;
-    private char gender;
+    private int age;
 
-    public Person(String name, char gender) {
+    public Person(String name, int age) {
         this.name = name;
-        this.gender = gender;
+        this.age = age;
     }
 
     public void greet() {
@@ -13,6 +13,20 @@ public class Person {
 
     @Override
     public String toString() {
-        return name;
+        return "Name: " + name +", Age: " + age;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        if (o.getClass() == this.getClass()) {
+            Person p = (Person) o;
+
+            return p.name.equals(this.name) && p.age == this.age;
+        } else {
+            return false;
+        }
     }
 }

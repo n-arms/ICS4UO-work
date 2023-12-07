@@ -1,9 +1,12 @@
 public class Main {
     public static void main(String[] args) {
-        Person alan = new Person("Alan", 'm');
-        alan.greet();
-
-        Student ada = new Student("Ada", 'X', "123456");
+        Person p = new Person("Alan", 42);
+        Student q = new Student("Ada", 37, "10010101");
+// print each person using toString
+        Person r = p;
+        System.out.println(r.equals(p));
+        Student s = new Student("Ada", 37, "10010101");
+        System.out.println(s.equals(q));
     }
 }
 
