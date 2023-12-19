@@ -1,12 +1,12 @@
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.image.*;
-import java.util.List;
-import java.util.Timer;
+import java.util.ArrayList;
 import javax.swing.*;
 public class Canvas extends JPanel {
-    private final int size = 3000;
+    private final int size = 600;
     private final BufferedImage bi = new BufferedImage(size, size, BufferedImage.TYPE_INT_RGB);
+    private final ArrayList<Shape> shapes = new ArrayList<>();
+    private final ArrayList<Shape> oldShapes = new ArrayList<Shape>();
 
     public Canvas() {
         ImageIcon icon = new ImageIcon(bi);
@@ -14,19 +14,20 @@ public class Canvas extends JPanel {
     }
 
     public void update() {
-        new Circle(new Point(100, 100), 100).draw(bi);
-//
-//        for (int y = 0; y < size; y += 5) {
-//            for (int x = 0; x < size; x++) {
-//                Color color = (Math.random() > 0.5) ? Color.RED : Color.GREEN;
-//                int colorValue = color.getRGB();
-//                bi.setRGB(x, y, colorValue);
-//                bi.setRGB(x, y + 1, colorValue);
-//                bi.setRGB(x, y + 2, colorValue);
-//                bi.setRGB(x, y + 3, colorValue);
-//                bi.setRGB(x, y + 4, colorValue);
-//            }
-//        }
+        for (Shape s : oldShapes) {
+            s.undraw(bi);
+        }
+        oldShapes.clear();
+        for (Shape s : shapes) {
+            s.draw(bi);
+            oldShapes.add(s);
+        }
+        shapes.clear();
+    }
+
+    public void drawCircle(int x, int y, int radius) {
+        Circle circle = new Circle(new Point(x, y), radius);
+        shapes.add(circle);
     }
 
     @Override
@@ -34,12 +35,16 @@ public class Canvas extends JPanel {
         super.paintComponent(g);
     }
 
-    public void startLoop(JFrame frame) {
+    public void startLoop() {
         update();
         this.repaint();
         try {
             Thread.sleep(20);
         } catch (Exception e) {}
-        EventQueue.invokeLater(() -> startLoop(frame));
+        EventQueue.invokeLater(this::startLoop);
+    }
+
+    public int getCanvasSize() {
+        return size;
     }
 }

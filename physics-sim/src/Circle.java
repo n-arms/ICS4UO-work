@@ -15,8 +15,10 @@ public class Circle extends Shape {
         for (int x = -radius; x <= radius; x++) {
             for (int y = -radius; y <= radius; y++) {
                 double distance = Math.sqrt(x*x + y*y);
-                if (distance <= radius) {
-                    bi.setRGB(centre.x + x, centre.y + y, Color.BLUE.getRGB());
+                int totalX = centre.x + x;
+                int totalY = centre.y + y;
+                if (totalX >= 0 && totalX < bi.getWidth() && totalY >= 0 && totalY <= bi.getHeight() && distance <= radius) {
+                    bi.setRGB(totalX, totalY, Color.BLUE.getRGB());
                 }
             }
         }
@@ -24,6 +26,15 @@ public class Circle extends Shape {
 
     @Override
     void undraw(BufferedImage bi) {
-
+        for (int x = -radius; x <= radius; x++) {
+            for (int y = -radius; y <= radius; y++) {
+                double distance = Math.sqrt(x*x + y*y);
+                int totalX = centre.x + x;
+                int totalY = centre.y + y;
+                if (totalX >= 0 && totalX < bi.getWidth() && totalY >= 0 && totalY <= bi.getHeight() && distance <= radius) {
+                    bi.setRGB(totalX, totalY, Color.BLACK.getRGB());
+                }
+            }
+        }
     }
 }
