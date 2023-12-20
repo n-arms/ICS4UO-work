@@ -17,8 +17,8 @@ public class Circle extends Shape {
                 double distance = Math.sqrt(x*x + y*y);
                 int totalX = centre.x + x;
                 int totalY = centre.y + y;
-                if (totalX >= 0 && totalX < bi.getWidth() && totalY >= 0 && totalY <= bi.getHeight() && distance <= radius) {
-                    bi.setRGB(totalX, totalY, Color.BLUE.getRGB());
+                if (distance <= radius) {
+                    setRGB(bi, totalX, totalY, Color.BLUE.getRGB());
                 }
             }
         }
@@ -31,8 +31,8 @@ public class Circle extends Shape {
                 double distance = Math.sqrt(x*x + y*y);
                 int totalX = centre.x + x;
                 int totalY = centre.y + y;
-                if (totalX >= 0 && totalX < bi.getWidth() && totalY >= 0 && totalY <= bi.getHeight() && distance <= radius) {
-                    bi.setRGB(totalX, totalY, Color.BLACK.getRGB());
+                if (distance <= radius) {
+                    setRGB(bi, totalX, totalY, Color.BLACK.getRGB());
                 }
             }
         }

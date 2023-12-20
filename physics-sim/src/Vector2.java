@@ -18,6 +18,15 @@ public class Vector2 {
     public Vector2 scale(double factor) {
         return new Vector2(x * factor, y * factor);
     }
+    public Vector2 scaleX(double factor) {
+        return new Vector2(x * factor, y);
+    }
+    public Vector2 scaleY(double factor) {
+        return new Vector2(x, y * factor);
+    }
+    public Vector2 pairwiseMul(Vector2 other) {
+        return this.scaleX(other.x).scaleY(other.y);
+    }
 
     public double getX() {
         return x;
@@ -25,6 +34,10 @@ public class Vector2 {
 
     public double getY() {
         return y;
+    }
+
+    public double magnitude() {
+        return Math.sqrt(x*x + y*y);
     }
 
     @Override

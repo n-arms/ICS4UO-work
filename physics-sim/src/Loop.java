@@ -10,8 +10,8 @@ public class Loop {
     public Loop() {
         lastUpdate = System.currentTimeMillis();
         var particles = new ArrayList<Particle>();
-        particles.add(new Disk(new Vector2(50, 0), 10));
-        sim = new Simulation(particles, 100);
+        particles.add(new Disk(new Vector2(5, 7), 10));
+        sim = new Simulation(particles, 10);
     }
     private void update() {
         sim.update(targetMillisPerFrame / 1000.0, canvas);
