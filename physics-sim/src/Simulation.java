@@ -3,14 +3,17 @@ import java.util.ArrayList;
 public class Simulation {
     private final ArrayList<Particle> particles;
     private final double size;
+    private final SegmentedWorld world;
 
     public Simulation(ArrayList<Particle> particles, double size) {
         this.particles = particles;
         this.size = size;
+        this.world = new SegmentedWorld(size);
     }
 
     public void update(double dt, Canvas c) {
         gravity();
+        collisions();
         edgeCollisions();
         for (Particle p : particles) {
             p.update(dt);
@@ -29,6 +32,14 @@ public class Simulation {
         return 0 <= coord && coord < size;
     }
 
+    private void collisions() {
+        world.clear();
+        for (Particle p : particles) {
+            p.collide(world);
+        }
+        world.update();
+    }
+
     private void edgeCollisions() {
         for (Particle p : particles) {
             double x = p.getPosition().getX();
@@ -40,5 +51,6 @@ public class Simulation {
                 p.setVelocity(p.getVelocity().scaleY(-1));
             }
         }
+        world.update();
     }
 }

@@ -26,7 +26,12 @@ public class Canvas extends JPanel {
     }
 
     public void drawCircle(int x, int y, int radius) {
-        Circle circle = new Circle(new Point(x, y), radius);
+        Circle circle = new Circle(new Point(x, y), radius, Color.BLUE);
+        shapes.add(circle);
+    }
+
+    public void drawCircle(int x, int y, int radius, Color color) {
+        Circle circle = new Circle(new Point(x, y), radius, color);
         shapes.add(circle);
     }
 

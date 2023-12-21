@@ -5,9 +5,12 @@ public class Circle extends Shape {
     Point centre;
     int radius;
 
-    public Circle(Point centre, int radius) {
+    Color color;
+
+    public Circle(Point centre, int radius, Color color) {
         this.centre = centre;
         this.radius = radius;
+        this.color = color;
     }
 
     @Override
@@ -18,7 +21,7 @@ public class Circle extends Shape {
                 int totalX = centre.x + x;
                 int totalY = centre.y + y;
                 if (distance <= radius) {
-                    setRGB(bi, totalX, totalY, Color.BLUE.getRGB());
+                    setRGB(bi, totalX, totalY, color.getRGB());
                 }
             }
         }

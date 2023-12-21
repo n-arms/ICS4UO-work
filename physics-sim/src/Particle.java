@@ -26,7 +26,9 @@ public abstract class Particle {
         acceleration.addEquals(force.scale(1 / mass));
     }
     public void collisionForce(Vector2 pointOfCollision) {
-        var distance = position.add(pointOfCollision.scale(-1)).normalize();
+        System.out.println("Colliding");
+        var normal = position.add(pointOfCollision.scale(-1)).normalize();
+        velocity = velocity.pairwiseMul(normal);
     }
     public abstract void collide(SegmentedWorld world);
     public abstract void render(Canvas c, Function<Vector2, Vector2> canvasTransform);

@@ -40,6 +40,10 @@ public class Vector2 {
         return Math.sqrt(x*x + y*y);
     }
 
+    public Vector2 normalize() {
+        return this.scale(1 / this.magnitude());
+    }
+
     @Override
     public String toString() {
         return "Vector2{" + "x=" + x + ", y=" + y + '}';

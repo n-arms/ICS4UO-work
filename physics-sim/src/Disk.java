@@ -1,11 +1,32 @@
+import java.awt.*;
 import java.util.function.Function;
 
 public class Disk extends Particle {
     private final double radius;
-    public Disk(Vector2 position, double mass) {
+    private final Color color;
+    public Disk(Vector2 position, double mass, Color color) {
         this.position = position;
         this.mass = mass;
         radius = Math.sqrt(mass);
+        this.color = color;
+    }
+
+    public Disk(Vector2 position, Vector2 velocity, double mass, Color color) {
+        this.position = position;
+        this.velocity = velocity;
+        this.mass = mass;
+        radius = Math.sqrt(mass);
+        this.color = color;
+
+    }
+
+    public Disk(Vector2 position, Vector2 velocity, double mass) {
+        this.position = position;
+        this.velocity = velocity;
+        this.mass = mass;
+        radius = Math.sqrt(mass);
+        this.color = Color.BLUE;
+
     }
 
     @Override
@@ -25,8 +46,7 @@ public class Disk extends Particle {
     @Override
     public void render(Canvas c, Function<Vector2, Vector2> canvasTransform) {
         Vector2 canvasPos = canvasTransform.apply(position);
-        System.out.printf("Real position %s was transformed to canvas position %s%n", position, canvasPos);
-        c.drawCircle((int) canvasPos.getX(), (int) canvasPos.getY(), 50);
+        c.drawCircle((int) canvasPos.getX(), (int) canvasPos.getY(), 50, color);
     }
 
     @Override
