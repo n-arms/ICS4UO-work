@@ -51,6 +51,5 @@ public class Simulation {
                 p.setVelocity(p.getVelocity().scaleY(-1));
             }
         }
-        world.update();
     }
 }

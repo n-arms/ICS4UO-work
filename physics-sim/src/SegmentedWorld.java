@@ -1,4 +1,7 @@
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class SegmentedWorld {
     private final double size;
@@ -44,41 +47,67 @@ public class SegmentedWorld {
         return new Vector2(x, y);
     }
 
-    private void testRandomCollision(int rowNum, int colNum) {
+    record Collision(int first, int second, Vector2 point) {}
+
+    private Optional<Collision> testRandomCollision(int rowNum, int colNum) {
         var pool = grid[rowNum][colNum];
         Vector2 point = randomPoint(rowNum, colNum);
+
+        Function<Vector2, Vector2> trans = position -> position.scale(Loop.pubCanv.getCanvasSize() / size).pairwiseMul(new Vector2(1, -1)).add(new Vector2(0, Loop.pubCanv.getCanvasSize()));
+
+        var toDraw = trans.apply(point);
+
         for (int first = 0; first < pool.size(); first++) {
             for (int second = 0; second < first; second++) {
                 Particle a = pool.get(first);
                 Particle b = pool.get(second);
 
-                System.out.printf("Checking two particles with distances %s and %s%n", a.distance(point), b.distance(point));
+                //System.out.printf("Checking two particles with distances %s and %s%n", a.distance(point), b.distance(point));
 
                 if (a.distance(point) <= 0 && b.distance(point) <= 0) {
+                    System.out.println("collision");
                     a.collisionForce(point);
                     b.collisionForce(point);
-                    return;
-                } else {
-                    System.out.println("they didn't collide");
+                    Loop.pubCanv.drawCircle((int) toDraw.getX(), (int) toDraw.getY(), 10, Color.RED);
+                    return Optional.of(new Collision(first, second, point));
                 }
             }
         }
+
+        return Optional.empty();
     }
     public void update() {
+        drawGrid();
+
         for (int rowNum = 0; rowNum < grid.length; rowNum++) {
             var row = grid[rowNum];
             for (int colNum = 0; colNum < row.length; colNum++) {
                 var pool = row[colNum];
 
-                if (pool.size() <= 1) {
+                if (pool.isEmpty()) {
                     continue;
                 }
 
+                Loop.fillGrid(rowNum, colNum, Color.GREEN);
+
+                if (pool.size() == 1) {
+                    continue;
+                }
+
+
                 System.out.println("testing for big boom");
 
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < 1000; i++) {
                     testRandomCollision(rowNum, colNum);
                 }
+            }
+        }
+
+    }
+    private void drawGrid() {
+        for (int row = 0; row <= grid.length; row++) {
+            for (int col = 0; col <= grid[0].length; col++) {
+                Loop.highlightGrid(row, col, Color.YELLOW);
             }
         }
     }

@@ -15,6 +15,10 @@ public class Vector2 {
         this.y += other.y;
     }
 
+    public Vector2 sub(Vector2 other) {
+        return this.add(other.scale(-1));
+    }
+
     public Vector2 scale(double factor) {
         return new Vector2(x * factor, y * factor);
     }
@@ -26,6 +30,9 @@ public class Vector2 {
     }
     public Vector2 pairwiseMul(Vector2 other) {
         return this.scaleX(other.x).scaleY(other.y);
+    }
+    public double dot(Vector2 other) {
+        return this.x * other.x + this.y * other.y;
     }
 
     public double getX() {
@@ -48,4 +55,5 @@ public class Vector2 {
     public String toString() {
         return "Vector2{" + "x=" + x + ", y=" + y + '}';
     }
+
 }

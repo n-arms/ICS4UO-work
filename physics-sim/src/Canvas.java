@@ -35,6 +35,21 @@ public class Canvas extends JPanel {
         shapes.add(circle);
     }
 
+    public void drawRectangle(int x, int y, int width, int height) {
+        Rectangle rect = new Rectangle(new Point(x, y), width, height, Color.BLUE);
+        shapes.add(rect);
+    }
+
+    public void drawRectangle(int x, int y, int width, int height, Color color) {
+        Rectangle rect = new Rectangle(new Point(x, y), width, height, color);
+        shapes.add(rect);
+    }
+
+    public void drawRectangle(int x, int y, int width, int height, Color color, Color stroke) {
+        Rectangle rect = new Rectangle(new Point(x, y), width, height, color, stroke);
+        shapes.add(rect);
+    }
+
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
