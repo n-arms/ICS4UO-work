@@ -1,3 +1,4 @@
+import java.util.Scanner;
 import java.util.function.Function;
 
 public abstract class Particle {
@@ -27,6 +28,7 @@ public abstract class Particle {
     }
     public void collisionForce(Vector2 pointOfCollision) {
         if (distance(pointOfCollision) >= 0) {
+            System.out.println("Didn't actually collide");
             return;
         }
         System.out.println("Colliding.");
@@ -41,13 +43,13 @@ public abstract class Particle {
         System.out.printf("The normal was calculated to be %s.%n", normal);
         System.out.printf("The velocity was updated to be %s.%n", velocity);
 
-
-        while (distance(pointOfCollision) < 0) {
-            position.addEquals(velocity.scale(0.001));
+        if (velocity.magnitude() > 0.00001) {
+            while (distance(pointOfCollision) < 0) {
+                position.addEquals(velocity.scale(0.001));
+            }
         }
 
-        //throw new RuntimeException();
-
+        System.out.printf("The position was updated to be %s.%n", position);
     }
     public abstract void collide(SegmentedWorld world);
     public abstract void render(Canvas c, Function<Vector2, Vector2> canvasTransform);

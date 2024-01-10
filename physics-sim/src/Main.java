@@ -1,16 +1,18 @@
 import java.awt.*;
 
 public class Main {
-    public static void main(String[] args) {
-        Loop l = new Loop();
-        EventQueue.invokeLater(l::start);
-    }
 //    public static void main(String[] args) {
-//        new Disk(new Vector2(0, 0), 20, Color.GREEN).collide(new SegmentedWorld(10, 5) {
-//            @Override
-//            public void addParticle(int gridRow, int gridCol, Particle p) {
-//                System.out.printf("Adding circle at row %s and col %s.%n", gridRow, gridCol);
-//            }
-//        });
+//        Loop l = new Loop();
+//        EventQueue.invokeLater(l::start);
 //    }
+    public static void main(String[] args) {
+        SegmentedWorld w = new SegmentedWorld(10, 1);
+        Particle p = new Disk(new Vector2(5, 5), new Vector2(1, 0), 1, Color.BLUE);
+        Particle q = new Disk(new Vector2(6.5, 5), new Vector2(0, 0), 1, Color.BLUE);
+
+        p.collide(w);
+        q.collide(w);
+        w.update();
+        System.out.println("Done");
+    }
 }

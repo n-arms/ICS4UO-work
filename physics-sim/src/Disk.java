@@ -41,6 +41,7 @@ public class Disk extends Particle {
 //                Vector2 toDraw = trans.apply(new Vector2(col, row));
 //                Loop.pubCanv.drawCircle((int) toDraw.getX(), (int) toDraw.getY(), 20, Color.PINK);
                 world.addParticle(row, col, this);
+                System.out.printf("Adding particle at col %s and row %s\n", col, row);
             }
         }
     }
