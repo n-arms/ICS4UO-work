@@ -31,16 +31,15 @@ public class Disk extends Particle {
 
     @Override
     public void collide(SegmentedWorld world) {
-        int left = world.toGrid(position.getX() - radius);
-        int right = world.toGrid(position.getX() + radius);
-        int top = world.toGrid(position.getY() + radius);
-        int bottom = world.toGrid(position.getY() - radius);
+        int left = world.toGridFloor(position.getX() - radius);
+        int right = world.toGridCeil(position.getX() + radius);
+        int top = world.toGridCeil(position.getY() + radius);
+        int bottom = world.toGridFloor(position.getY() - radius);
 
         for (int col = left; col <= right; col++) {
             for (int row = bottom; row <= top; row++) {
-                Function<Vector2, Vector2> trans = position -> position.scale(Loop.pubCanv.getCanvasSize() / 11.0).pairwiseMul(new Vector2(1, -1)).add(new Vector2(0, Loop.pubCanv.getCanvasSize()));
-                Vector2 toDraw = trans.apply(new Vector2(col, row));
-                Loop.pubCanv.drawCircle((int) toDraw.getX(), (int) toDraw.getY(), 20, Color.PINK);
+//                Vector2 toDraw = trans.apply(new Vector2(col, row));
+//                Loop.pubCanv.drawCircle((int) toDraw.getX(), (int) toDraw.getY(), 20, Color.PINK);
                 world.addParticle(row, col, this);
             }
         }

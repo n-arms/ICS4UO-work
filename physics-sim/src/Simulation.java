@@ -1,23 +1,50 @@
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.function.Function;
 
 public class Simulation {
     private final ArrayList<Particle> particles;
     private final double size;
-    private final SegmentedWorld world;
+    public final SegmentedWorld world;
+    private static Function<Vector2, Vector2> toCanvasVectorTransform;
+    private static Function<Double, Double> toCanvasScalarTransform;
 
     public Simulation(ArrayList<Particle> particles, double size) {
         this.particles = particles;
         this.size = size;
-        this.world = new SegmentedWorld(size);
+        this.world = new SegmentedWorld(size, 20);
+    }
+
+    public static Vector2 toCanvas(Vector2 world) {
+        return toCanvasVectorTransform.apply(world);
+    }
+
+    public static double toCanvas(double world) {
+        return toCanvasScalarTransform.apply(world);
     }
 
     public void update(double dt, Canvas c) {
-        gravity();
+        toCanvasScalarTransform = scalar -> scalar * c.getCanvasSize() / size;
+        toCanvasVectorTransform = vector -> vector.scale(c.getCanvasSize() / size).pairwiseMul(new Vector2(1, -1)).add(new Vector2(0, c.getCanvasSize()));
+        drawGrid(c);
+        //gravity();
         collisions();
-        edgeCollisions();
+        //edgeCollisions();
         for (Particle p : particles) {
             p.update(dt);
-            p.render(c, position -> position.scale(c.getCanvasSize() / size).pairwiseMul(new Vector2(1, -1)).add(new Vector2(0, c.getCanvasSize())));
+            p.render(c, toCanvasVectorTransform);
+        }
+    }
+
+    private void drawGrid(Canvas c) {
+        int gridSize = (int) toCanvas(size / world.getGridsPerSide());
+        for (int row = 0; row <= world.getGridsPerSide(); row++) {
+            for (int col = 0; col <= world.getGridsPerSide(); col++) {
+                double worldX = world.fromGrid(col);
+                double worldY = world.fromGrid(row);
+                Vector2 canvas = toCanvas(new Vector2(worldX, worldY));
+                c.drawRectangle((int) canvas.getX(), (int) canvas.getY(), gridSize, gridSize, Color.BLACK, Color.YELLOW);
+            }
         }
     }
 

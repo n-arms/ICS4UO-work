@@ -26,6 +26,9 @@ public abstract class Particle {
         acceleration.addEquals(force.scale(1 / mass));
     }
     public void collisionForce(Vector2 pointOfCollision) {
+        if (distance(pointOfCollision) >= 0) {
+            return;
+        }
         System.out.println("Colliding.");
         System.out.printf("Currently at point %s.%n", position);
         System.out.printf("Current at velocity %s.%n", velocity);
@@ -39,8 +42,8 @@ public abstract class Particle {
         System.out.printf("The velocity was updated to be %s.%n", velocity);
 
 
-        for (int i = 0; i < 10; i++) {
-            position.addEquals(velocity.scale(0.01));
+        while (distance(pointOfCollision) < 0) {
+            position.addEquals(velocity.scale(0.001));
         }
 
         //throw new RuntimeException();
