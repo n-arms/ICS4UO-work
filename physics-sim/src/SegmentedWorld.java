@@ -1,4 +1,4 @@
-import java.awt.*;
+
 import java.util.*;
 import java.util.function.Function;
 
@@ -72,46 +72,100 @@ public class SegmentedWorld {
         return new Vector2(x, y);
     }
 
-    private boolean testRandomCollision(Particle a, Particle b, int rowNum, int colNum) {
+    public boolean testRandomCollisionIteration(Particle a, Particle b, int rowNum, int colNum) {
+        for (int iter = 0; iter < 100; iter++) {
+            var best = bestCollisionPoint(a, b, rowNum, colNum);
+
+            if (best.isPresent()) {
+                Vector2 point = best.get();
+
+                a.moveFromPoint(point);
+                b.moveFromPoint(point);
+            } else {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private Optional<Vector2> bestCollisionPoint(Particle a, Particle b, int rowNum, int colNum) {
         ArrayList<Vector2> collisions = new ArrayList<>();
-        for (int i = 0; i < 1000000; i++) {
+        for (int i = 0; i < 100000; i++) {
             Vector2 point = randomPoint(rowNum, colNum);
 
-            //var toDraw = trans.apply(point);
-
-            //System.out.printf("Checking two particles with distances %s and %s%n", a.distance(point), b.distance(point));
-
             if (a.distance(point) <= 0 && b.distance(point) <= 0) {
-                //System.out.println("collision");
                 collisions.add(point);
-                //Loop.pubCanv.drawCircle((int) toDraw.getX(), (int) toDraw.getY(), 10, Color.RED);
             }
         }
 
-        //System.out.printf("Collision list %s\n", collisions);
-
-        Optional<Vector2> best = collisions.stream().min((o1, o2) -> {
-            double distance1 = a.distance(o1) + b.distance(o1);
-            double distance2 = a.distance(o2) + b.distance(o2);
-
-            //System.out.printf("Collision %s has distance %s and collision %s has distance %s\n", o1, distance1, o2, distance2);
+        return collisions.stream().min((o1, o2) -> {
+            double distance1 = a.distance(o1) + b.distance(o1) + 0.01 * Math.abs(a.distance(o1) - b.distance(o1));
+            double distance2 = a.distance(o2) + b.distance(o2) + 0.01 * Math.abs(a.distance(o1) - b.distance(o1));
 
             return Double.compare(distance1, distance2);
         });
+    }
+
+    private boolean testRandomCollision(Particle a, Particle b, int rowNum, int colNum) {
+        var best = bestCollisionPoint(a, b, rowNum, colNum);
         System.out.printf("Best collision was %s\n", best);
         best.ifPresent(point -> {
             a.collisionForce(point);
             b.collisionForce(point);
-            //var p = Simulation.toCanvas(point);
-            //Loop.pubCanv.drawCircle((int) p.getX(), (int) p.getY(), 10, Color.BLUE);
-            s.nextLine();
+
             System.out.println("Got line");
         });
         return best.isPresent();
     }
     static Scanner s = new Scanner(System.in);
+
+    private record Collision(Particle a, Particle b) {}
+
+    private enum Edge {
+        LEFT, RIGHT, TOP, BOTTOM
+    }
+
+    private static<K, V> void addToMultimap(Map<K, HashSet<V>> map, K key, V element) {
+        var list = map.get(key);
+
+        if (list == null) {
+            map.put(key, new HashSet<>(List.of(element)));
+        } else {
+            list.add(element);
+        }
+    }
+
+    private boolean startCollision(Particle a, Particle b, HashSet<GridPosition> grids) {
+        ArrayList<Vector2> collisions = new ArrayList<>();
+        for (GridPosition grid : grids) {
+            for (int i = 0; i < 100000; i++) {
+                Vector2 point = randomPoint(grid.row, grid.col);
+
+                if (a.distance(point) <= 0 && b.distance(point) <= 0) {
+                    collisions.add(point);
+                }
+            }
+        }
+
+        Optional<Vector2> best = collisions.stream().min((o1, o2) -> {
+            double distance1 = a.distance(o1) + b.distance(o1) + 0.01 * Math.abs(a.distance(o1) - b.distance(o1));
+            double distance2 = a.distance(o2) + b.distance(o2) + 0.01 * Math.abs(a.distance(o1) - b.distance(o1));
+
+            return Double.compare(distance1, distance2);
+        });
+
+        best.ifPresent((point) -> {
+            a.collisionForce(point);
+            b.collisionForce(point);
+        });
+        return best.isPresent();
+    }
+
     public void update() {
         drawGrid();
+
+        HashMap<Collision, HashSet<GridPosition>> collisions = new HashMap<>();
+        HashMap<Particle, HashSet<Edge>> edgeCollisions = new HashMap<>();
 
         for (var position : grid.keySet()) {
             var pool = grid.get(position);
@@ -122,19 +176,15 @@ public class SegmentedWorld {
 
             for (Particle p : pool) {
                 if (position.row < 0) {
-                    System.out.println("Too low");
-                    p.collisionForce(new Vector2(p.getPosition().getX(), 0));
+                    addToMultimap(edgeCollisions, p, Edge.BOTTOM);
                 } else if (position.row >= gridsPerSide) {
-                    System.out.println("Too high");
-                    p.collisionForce(new Vector2(p.getPosition().getX(), fromGrid(gridsPerSide)));
+                    addToMultimap(edgeCollisions, p, Edge.TOP);
                 }
 
                 if (position.col < 0) {
-                    System.out.println("Too left");
-                    p.collisionForce(new Vector2(0, p.getPosition().getY()));
+                    addToMultimap(edgeCollisions, p, Edge.LEFT);
                 } else if (position.col >= gridsPerSide) {
-                    System.out.println("Too right");
-                    p.collisionForce(new Vector2(fromGrid(gridsPerSide), p.getPosition().getY()));
+                    addToMultimap(edgeCollisions, p, Edge.RIGHT);
                 }
             }
 
@@ -144,40 +194,41 @@ public class SegmentedWorld {
 
             for (int first = 0; first < pool.size(); first++) {
                 for (int second = 0; second < first; second++) {
-                    boolean colliding;
-                    do {
-                        colliding = testRandomCollision(pool.get(first), pool.get(second), position.row, position.col);
-                    } while (colliding);
+                    if (bestCollisionPoint(pool.get(first), pool.get(second), position.row, position.col).isPresent()) {
+                        addToMultimap(collisions, new Collision(pool.get(first), pool.get(second)), position);
+                    }
                 }
             }
         }
-//
-//        for (int rowNum = 0; rowNum < grid.length; rowNum++) {
-//            var row = grid[rowNum];
-//            for (int colNum = 0; colNum < row.length; colNum++) {
-//                var pool = row[colNum];
-//
-//                if (pool.isEmpty()) {
-//                    continue;
-//                }
-//
-//                //Loop.fillGrid(rowNum, colNum, Color.GREEN);
-//
-//                if (pool.size() == 1) {
-//                    continue;
-//                }
-//
-//
-//                System.out.println("testing for big boom");
-//
-//                for (int first = 0; first < pool.size(); first++) {
-//                    for (int second = 0; second < first; second++) {
-//                        testRandomCollision(pool.get(first), pool.get(second), rowNum, colNum);
-//                    }
-//                }
-//            }
-//        }
 
+        for (Particle p : edgeCollisions.keySet()) {
+            for (Edge e : edgeCollisions.get(p)) {
+                Vector2 collision = switch (e) {
+                    case LEFT -> new Vector2(0, p.getPosition().getY());
+                    case RIGHT -> new Vector2(fromGrid(gridsPerSide), p.getPosition().getY());
+                    case TOP -> new Vector2(p.getPosition().getX(), fromGrid(gridsPerSide));
+                    case BOTTOM -> new Vector2(p.getPosition().getX(), 0);
+                };
+                p.collisionForce(collision);
+            }
+        }
+
+        for (Collision c : collisions.keySet()) {
+            boolean colliding = startCollision(c.a, c.b, collisions.get(c));
+            while (colliding) {
+                collision = findBestCollisionPoint();
+                resolve(collision);
+            }
+        }
+
+
+        if (edgeCollisions.isEmpty()) {
+            return;
+        } else {
+            System.out.println(collisions);
+            System.out.println(edgeCollisions);
+            s.nextLine();
+        }
     }
     private void drawGrid() {
 //        for (int row = 0; row <= grid.length; row++) {

@@ -43,15 +43,26 @@ public abstract class Particle {
         System.out.printf("The normal was calculated to be %s.%n", normal);
         System.out.printf("The velocity was updated to be %s.%n", velocity);
 
+        moveFromPoint(pointOfCollision);
+
+        System.out.printf("The position was updated to be %s.%n", position);
+    }
+    public void moveFromPoint(Vector2 point) {
         if (velocity.magnitude() > 0.00001) {
-            while (distance(pointOfCollision) < 0) {
+            while (distance(point) < 0) {
                 position.addEquals(velocity.scale(0.001));
             }
         }
-
-        System.out.printf("The position was updated to be %s.%n", position);
     }
     public abstract void collide(SegmentedWorld world);
     public abstract void render(Canvas c, Function<Vector2, Vector2> canvasTransform);
     public abstract double distance(Vector2 point);
+
+    @Override
+    public String toString() {
+        return "Particle{" +
+                "position=" + position +
+                ", velocity=" + velocity +
+                '}';
+    }
 }
