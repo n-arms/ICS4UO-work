@@ -6,6 +6,10 @@ public class Vector2 {
         this.y = y;
     }
 
+    public Vector2() {
+        this(0, 0);
+    }
+
     public Vector2 add(Vector2 other) {
         return new Vector2(this.x + other.x, this.y + other.y);
     }
@@ -56,4 +60,11 @@ public class Vector2 {
         return "Vector2{" + "x=" + x + ", y=" + y + '}';
     }
 
+    public Vector2 abs() {
+        return new Vector2(Math.abs(x), Math.abs(y));
+    }
+
+    public Vector2 max(Vector2 other) {
+        return new Vector2(Math.max(this.x, other.x), Math.max(this.y, other.y));
+    }
 }

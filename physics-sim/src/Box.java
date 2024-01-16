@@ -1,15 +1,14 @@
-import java.awt.*;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.function.Function;
 
-public class Disk extends Particle {
+public class Box extends Particle {
     private final double radius;
 
-    public Disk(Vector2 position, Vector2 velocity, double mass, int identifier, double elasticity) {
+    public Box(Vector2 position, Vector2 velocity, double mass, int identifier, double elasticity) {
         super(position, identifier, mass, elasticity);
         this.velocity = velocity;
-        radius = Math.sqrt(mass / Math.PI);
+        radius = Math.sqrt(mass) / 2;
     }
 
     @Override
@@ -21,8 +20,6 @@ public class Disk extends Particle {
 
         for (int col = left; col <= right; col++) {
             for (int row = bottom; row <= top; row++) {
-//                Vector2 toDraw = trans.apply(new Vector2(col, row));
-//                Loop.pubCanv.drawCircle((int) toDraw.getX(), (int) toDraw.getY(), 20, Color.PINK);
                 world.addParticle(row, col, this);
             }
         }
@@ -32,17 +29,20 @@ public class Disk extends Particle {
     public void render(Canvas c, Function<Vector2, Vector2> vectorTransform, Function<Double, Double> scalarTransform) {
         Vector2 canvasPos = vectorTransform.apply(position);
         int canvasRadius = scalarTransform.apply(radius).intValue();
-        c.drawCircle((int) canvasPos.getX(), (int) canvasPos.getY(), canvasRadius, color);
+        c.drawRectangle((int) canvasPos.getX() - canvasRadius, (int) canvasPos.getY() - canvasRadius, 2 * canvasRadius, 2 * canvasRadius, color);
     }
 
     @Override
     public double distance(Vector2 point) {
-        return point.add(position.scale(-1)).magnitude() - radius;
+        Vector2 relativePoint = point.sub(position).abs();
+        Vector2 radiusVector = new Vector2(radius, radius);
+
+        return relativePoint.sub(radiusVector).max(new Vector2()).magnitude();
     }
 
     @Override
     public void writeToCSV(Writer writer) throws IOException {
         super.writeToCSV(writer);
-        writer.write(",disk");
+        writer.write(",box");
     }
 }

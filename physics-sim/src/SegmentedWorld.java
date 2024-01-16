@@ -5,6 +5,8 @@ import java.util.function.Function;
 public class SegmentedWorld {
     private final double size;
     private final int gridsPerSide;
+
+
     record GridPosition(int row, int col) {}
     private final HashMap<GridPosition, ArrayList<Particle>> grid;
     public SegmentedWorld(double size, int gridsPerSide) {
@@ -25,25 +27,6 @@ public class SegmentedWorld {
         var position = new GridPosition(gridRow, gridCol);
         var pool = grid.computeIfAbsent(position, k -> new ArrayList<>());
         pool.add(particle);
-//
-//        if (inBounds(gridRow) && inBounds(gridCol)) {
-//            grid[gridRow][gridCol].add(particle);
-//        } else {
-//            if (gridRow < 0) {
-//                particle.collisionForce(new Vector2(particle.getPosition().getX(), 0));
-//            } else if (gridRow >= gridsPerSide) {
-//                particle.collisionForce(new Vector2(particle.getPosition().getX(), fromGrid(gridsPerSide)));
-//            }
-//
-//            if (gridCol < 0) {
-//                particle.collisionForce(new Vector2(0, particle.getPosition().getY()));
-//            } else if (gridCol >= gridsPerSide) {
-//                particle.collisionForce(new Vector2(fromGrid(gridsPerSide), particle.getPosition().getY()));
-//            }
-//            System.out.printf("Trying to add particle at row %s and col %s%n", gridRow, gridCol);
-//        }
-
-        //Loop.fillGrid(gridRow, gridCol, Color.PINK);
     }
     public boolean inBounds(int coord) {
         return 0 <= coord && coord < gridsPerSide;
@@ -90,7 +73,7 @@ public class SegmentedWorld {
 
     private Optional<Vector2> bestCollisionPoint(Particle a, Particle b, int rowNum, int colNum) {
         ArrayList<Vector2> collisions = new ArrayList<>();
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 100; i++) {
             Vector2 point = randomPoint(rowNum, colNum);
 
             if (a.distance(point) <= 0 && b.distance(point) <= 0) {
@@ -105,19 +88,6 @@ public class SegmentedWorld {
             return Double.compare(distance1, distance2);
         });
     }
-
-    private boolean testRandomCollision(Particle a, Particle b, int rowNum, int colNum) {
-        var best = bestCollisionPoint(a, b, rowNum, colNum);
-        System.out.printf("Best collision was %s\n", best);
-        best.ifPresent(point -> {
-            a.collisionForce(point);
-            b.collisionForce(point);
-
-            System.out.println("Got line");
-        });
-        return best.isPresent();
-    }
-    static Scanner s = new Scanner(System.in);
 
     private record Collision(Particle a, Particle b) {}
 
@@ -135,10 +105,10 @@ public class SegmentedWorld {
         }
     }
 
-    private boolean startCollision(Particle a, Particle b, HashSet<GridPosition> grids) {
+    private Optional<Vector2> findBestCollisionPointIn(Particle a, Particle b, HashSet<GridPosition> grids) {
         ArrayList<Vector2> collisions = new ArrayList<>();
         for (GridPosition grid : grids) {
-            for (int i = 0; i < 100000; i++) {
+            for (int i = 0; i < 100; i++) {
                 Vector2 point = randomPoint(grid.row, grid.col);
 
                 if (a.distance(point) <= 0 && b.distance(point) <= 0) {
@@ -147,12 +117,16 @@ public class SegmentedWorld {
             }
         }
 
-        Optional<Vector2> best = collisions.stream().min((o1, o2) -> {
+        return collisions.stream().min((o1, o2) -> {
             double distance1 = a.distance(o1) + b.distance(o1) + 0.01 * Math.abs(a.distance(o1) - b.distance(o1));
             double distance2 = a.distance(o2) + b.distance(o2) + 0.01 * Math.abs(a.distance(o1) - b.distance(o1));
 
             return Double.compare(distance1, distance2);
         });
+    }
+
+    private boolean startCollision(Particle a, Particle b, HashSet<GridPosition> grids) {
+        var best = findBestCollisionPointIn(a, b, grids);
 
         best.ifPresent((point) -> {
             a.collisionForce(point);
@@ -162,7 +136,7 @@ public class SegmentedWorld {
     }
 
     public void update() {
-        drawGrid();
+        //drawGrid();
 
         HashMap<Collision, HashSet<GridPosition>> collisions = new HashMap<>();
         HashMap<Particle, HashSet<Edge>> edgeCollisions = new HashMap<>();
@@ -214,21 +188,73 @@ public class SegmentedWorld {
         }
 
         for (Collision c : collisions.keySet()) {
-            boolean colliding = startCollision(c.a, c.b, collisions.get(c));
+            var best = findBestCollisionPointIn(c.a, c.b, collisions.get(c));
+            best.ifPresent(point -> {
+//                c.a.repulsionForce(point);
+//                c.b.repulsionForce(point);
+                c.a.collisionForce(point);
+                c.b.collisionForce(point);
+
+                while (true) {
+                    var collision = findBestCollisionPointIn(c.a, c.b, collisions.get(c));
+                    collision.ifPresent(innerPoint -> {
+                        c.a.moveFromPoint(innerPoint);
+                        c.b.moveFromPoint(innerPoint);
+                    });
+                    if (!collision.isPresent()) {
+                        break;
+                    }
+                }
+            });
+        }
+/*
+        long findingTime = 0;
+        long movingTime = 0;
+        long start;
+
+        for (Collision c : collisions.keySet()) {
+            start = System.currentTimeMillis();
+            var best = findBestCollisionPointIn(c.a, c.b, collisions.get(c));
+            findingTime += System.currentTimeMillis() - start;
+
+            start = System.currentTimeMillis();
+            best.ifPresent((point) -> {
+                c.a.collisionForce(point);
+                c.b.collisionForce(point);
+            });
+            movingTime += System.currentTimeMillis() - start;
+            boolean colliding = best.isPresent();
+            int i = 0;
             while (colliding) {
-                collision = findBestCollisionPoint();
-                resolve(collision);
+                start = System.currentTimeMillis();
+
+                var collision = findBestCollisionPointIn(c.a, c.b, collisions.get(c));
+                findingTime += System.currentTimeMillis() - start;
+
+                colliding = collision.isPresent();
+
+                start = System.currentTimeMillis();
+                if (colliding) {
+                    c.a.moveFromPoint(collision.get());
+                    c.b.moveFromPoint(collision.get());
+                }
+                movingTime += System.currentTimeMillis() - start;
+                if (i ++ > 100) {
+                    break;
+                }
             }
         }
 
 
-        if (edgeCollisions.isEmpty()) {
+        if (edgeCollisions.isEmpty() && collisions.isEmpty()) {
             return;
         } else {
             System.out.println(collisions);
             System.out.println(edgeCollisions);
-            s.nextLine();
+            System.out.printf("%d millis finding, %d millis moving\n", findingTime, movingTime);
         }
+
+        */
     }
     private void drawGrid() {
 //        for (int row = 0; row <= grid.length; row++) {

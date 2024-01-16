@@ -11,13 +11,9 @@ public class Loop {
 
     public static Canvas pubCanv;
     private static Simulation pubSim;
-    public Loop() {
+    public Loop(Simulation simulation) {
         lastUpdate = System.currentTimeMillis();
-        var particles = new ArrayList<Particle>();
-        particles.add(new Disk(new Vector2(3, 7), new Vector2(5, 0), 1));
-        particles.add(new Disk(new Vector2(7, 7), new Vector2(-5, 0), 1, Color.GREEN));
-        //particles.add(new Disk(new Vector2(7, 7), new Vector2(-5, 0), 1, Color.GREEN));
-        sim = new Simulation(particles, 11);
+        sim = simulation;
         pubCanv = canvas;
         pubSim = sim;
     }
