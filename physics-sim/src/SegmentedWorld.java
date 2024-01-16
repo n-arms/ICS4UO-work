@@ -62,8 +62,8 @@ public class SegmentedWorld {
             if (best.isPresent()) {
                 Vector2 point = best.get();
 
-                a.moveFromPoint(point);
-                b.moveFromPoint(point);
+                a.moveFromPoint(point, size);
+                b.moveFromPoint(point, size);
             } else {
                 return false;
             }
@@ -89,7 +89,24 @@ public class SegmentedWorld {
         });
     }
 
-    private record Collision(Particle a, Particle b) {}
+    private record Collision(Particle a, Particle b) {
+        @Override
+        public int hashCode() {
+            // commutative hashing
+            return a.hashCode() + b.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof Collision collision) {
+                boolean sameOrder = this.a.equals(collision.a) && this.b.equals(collision.b);
+                boolean swapped = this.b.equals(collision.a) && this.a.equals(collision.b);
+                return sameOrder || swapped;
+            } else {
+                return false;
+            }
+        }
+    }
 
     private enum Edge {
         LEFT, RIGHT, TOP, BOTTOM
@@ -129,8 +146,8 @@ public class SegmentedWorld {
         var best = findBestCollisionPointIn(a, b, grids);
 
         best.ifPresent((point) -> {
-            a.collisionForce(point);
-            b.collisionForce(point);
+            a.collisionForce(point, size);
+            b.collisionForce(point, size);
         });
         return best.isPresent();
     }
@@ -183,7 +200,7 @@ public class SegmentedWorld {
                     case TOP -> new Vector2(p.getPosition().getX(), fromGrid(gridsPerSide));
                     case BOTTOM -> new Vector2(p.getPosition().getX(), 0);
                 };
-                p.collisionForce(collision);
+                p.collisionForce(collision, size);
             }
         }
 
@@ -192,19 +209,23 @@ public class SegmentedWorld {
             best.ifPresent(point -> {
 //                c.a.repulsionForce(point);
 //                c.b.repulsionForce(point);
-                c.a.collisionForce(point);
-                c.b.collisionForce(point);
+                System.out.printf("Starting resolution between %s and %s\n", c.a, c.b);
+                c.a.collisionForce(point, size);
+                c.b.collisionForce(point, size);
 
-                while (true) {
+                for (int i = 0; i < 3; i++) {
+                    System.out.printf("Resolving collision between %s and %s\n", c.a, c.b);
                     var collision = findBestCollisionPointIn(c.a, c.b, collisions.get(c));
+                    System.out.printf("Found collision point %s\n", collision);
                     collision.ifPresent(innerPoint -> {
-                        c.a.moveFromPoint(innerPoint);
-                        c.b.moveFromPoint(innerPoint);
+                        c.a.moveFromPoint(innerPoint, size);
+                        c.b.moveFromPoint(innerPoint, size);
                     });
                     if (!collision.isPresent()) {
-                        break;
+                        return;
                     }
                 }
+                throw new RuntimeException();
             });
         }
 /*

@@ -52,8 +52,9 @@ public abstract class Particle {
         Vector2 normal = displacement.normalize();
         applyForce(normal.scale(length));
     }
-    public void collisionForce(Vector2 pointOfCollision) {
+    public void collisionForce(Vector2 pointOfCollision, double size) {
         if (distance(pointOfCollision) > 0) {
+            System.out.println("Tried to resolve collisionless collision");
             return;
         }
 
@@ -61,13 +62,29 @@ public abstract class Particle {
         Vector2 reflection = velocity.sub(normal.scale(2).scale(normal.dot(velocity))).scale(elasticity);
         velocity = reflection;
 
-        moveFromPoint(pointOfCollision);
+        moveFromPoint(pointOfCollision, size);
     }
-    public void moveFromPoint(Vector2 point) {
-        if (velocity.magnitude() > 0.00001) {
-            while (distance(point) < 0) {
-                position.addEquals(velocity.scale(0.001));
+    public void moveFromPoint(Vector2 point, double size) {
+        Vector2 immediateVelocity = position.sub(point);
+        boolean goingRight = immediateVelocity.getX() > 0;
+        boolean goingUp = immediateVelocity.getY() > 0;
+        if (immediateVelocity.magnitude() > 0.00001) {
+            while (distance(point) <= 0) {
+                Vector2 newPosition = position.add(immediateVelocity.scale(0.001));
+                if (newPosition.getX() < 0 && !goingRight) {
+                    throw new RuntimeException("Clipped left");
+                } else if (newPosition.getX() > size && goingRight) {
+                    throw new RuntimeException("Clipped right");
+                } else if (newPosition.getY() < 0 && !goingUp) {
+                    throw new RuntimeException("Clipped down");
+                } else if (newPosition.getY() > size && goingUp) {
+                    throw new RuntimeException("Clipped up");
+                } else {
+                    position = newPosition;
+                }
             }
+        } else {
+            throw new RuntimeException("Immediate velocity was too small to resolve");
         }
     }
     public abstract void collide(SegmentedWorld world);
