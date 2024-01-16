@@ -43,15 +43,6 @@ public abstract class Particle {
     public void applyForce(Vector2 force) {
         acceleration.addEquals(force.scale(1 / mass));
     }
-    public void repulsionForce(Vector2 point) {
-        if (distance(point) >= 0) {
-            return;
-        }
-        Vector2 displacement = position.sub(point);
-        double length = Math.min(3, 0.002 / Math.pow(displacement.magnitude(), 2));
-        Vector2 normal = displacement.normalize();
-        applyForce(normal.scale(length));
-    }
     public void collisionForce(Vector2 pointOfCollision, double size) {
         if (distance(pointOfCollision) > 0) {
             System.out.println("Tried to resolve collisionless collision");
@@ -90,7 +81,6 @@ public abstract class Particle {
     public abstract void collide(SegmentedWorld world);
     public abstract void render(Canvas c, Function<Vector2, Vector2> vectorTransform, Function<Double, Double> scalarTransform);
     public abstract double distance(Vector2 point);
-
     @Override
     public String toString() {
         return "Particle{" +
@@ -98,23 +88,18 @@ public abstract class Particle {
                 ", velocity=" + velocity +
                 '}';
     }
-
     public void writeToCSV(Writer writer) throws IOException {
         writer.write(String.format("%f,%f,%f,%f,%d,%f,%f", position.getX(), position.getY(), velocity.getX(), velocity.getY(), identifier, mass, elasticity));
     }
-
     public void setPosition(Vector2 position) {
         this.position = position;
     }
-
     public void setMass(double mass) {
         this.mass = mass;
     }
-
     public void setColor(Color color) {
         this.color = color;
     }
-
     public int getIdentifier() {
         return identifier;
     }

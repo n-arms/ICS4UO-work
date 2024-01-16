@@ -9,33 +9,14 @@ public class Loop {
     private long lastUpdate;
     private final Simulation sim;
 
-    public static Canvas pubCanv;
-    private static Simulation pubSim;
     public Loop(Simulation simulation) {
         lastUpdate = System.currentTimeMillis();
         sim = simulation;
-        pubCanv = canvas;
-        pubSim = sim;
     }
     private void update() {
         sim.update(targetMillisPerFrame / 1000.0, canvas);
     }
 
-    public static void highlightGrid(int rowNum, int colNum, Color color) {
-//        int rectSize = (int) Math.abs(trans.apply(new Vector2(1, 0)).sub(trans.apply(new Vector2(0, 0))).getX());
-//
-//        var point = new Vector2(colNum, rowNum);
-//        var toDraw = trans.apply(point);
-//        Loop.pubCanv.drawRectangle((int) toDraw.getX(), (int) toDraw.getY(), rectSize, rectSize, Color.BLACK, color);
-
-    }
-    public static void fillGrid(int rowNum, int colNum, Color color) {
-        double gridSize = Simulation.toCanvas(pubSim.world.getGridSize());
-
-        var point = new Vector2(pubSim.world.fromGrid(colNum), pubSim.world.fromGrid(rowNum));
-        var toDraw = Simulation.toCanvas(point);
-        Loop.pubCanv.drawRectangle((int) toDraw.getX(), (int) toDraw.getY(), (int) gridSize, (int) gridSize, color);
-    }
     private void loop() {
         long now = System.currentTimeMillis();
         long dt = now - lastUpdate;

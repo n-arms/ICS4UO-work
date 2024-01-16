@@ -108,19 +108,6 @@ public class Simulation {
         world.update();
     }
 
-    private void edgeCollisions() {
-        for (Particle p : particles) {
-            double x = p.getPosition().getX();
-            double y = p.getPosition().getY();
-            if (!inBounds(x)) {
-                p.setVelocity(p.getVelocity().scaleX(-1));
-            }
-            if (!inBounds(y)) {
-                p.setVelocity(p.getVelocity().scaleY(-1));
-            }
-        }
-    }
-
     public void addParticle(Particle particle) {
         particles.add(particle);
     }
@@ -142,9 +129,6 @@ public class Simulation {
     }
     public double maxCoord() {
         return size;
-    }
-    public int maxParticleId() {
-        return particles.size() - 1;
     }
 
     public Particle getParticleById(int id) {
