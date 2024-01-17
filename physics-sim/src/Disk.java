@@ -41,6 +41,11 @@ public class Disk extends Particle {
     }
 
     @Override
+    public Vector2 normal(Vector2 point) {
+        return point.sub(position).normalize();
+    }
+
+    @Override
     public void writeToCSV(Writer writer) throws IOException {
         super.writeToCSV(writer);
         writer.write(",disk");

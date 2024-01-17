@@ -49,14 +49,15 @@ public abstract class Particle {
             return;
         }
 
-        var normal = position.add(pointOfCollision.scale(-1)).normalize();
-        Vector2 reflection = velocity.sub(normal.scale(2).scale(normal.dot(velocity))).scale(elasticity);
+        var normal = normal(pointOfCollision);// normal = position.add(pointOfCollision.scale(-1)).normalize();
+        var direction = pointOfCollision.sub(position).dot(velocity) > 0 ? 1 : -1;
+        Vector2 reflection = velocity.sub(normal.scale(2).scale(normal.dot(velocity))).scale(elasticity).scale(direction);
         velocity = reflection;
 
         moveFromPoint(pointOfCollision, size);
     }
     public void moveFromPoint(Vector2 point, double size) {
-        Vector2 immediateVelocity = position.sub(point);
+        Vector2 immediateVelocity = normal(point).scale(-1);
         boolean goingRight = immediateVelocity.getX() > 0;
         boolean goingUp = immediateVelocity.getY() > 0;
         if (immediateVelocity.magnitude() > 0.00001) {
@@ -81,6 +82,7 @@ public abstract class Particle {
     public abstract void collide(SegmentedWorld world);
     public abstract void render(Canvas c, Function<Vector2, Vector2> vectorTransform, Function<Double, Double> scalarTransform);
     public abstract double distance(Vector2 point);
+    public abstract Vector2 normal(Vector2 point);
     @Override
     public String toString() {
         return "Particle{" +

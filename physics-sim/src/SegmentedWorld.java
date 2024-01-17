@@ -178,7 +178,7 @@ public class SegmentedWorld {
                 c.a.collisionForce(point, size);
                 c.b.collisionForce(point, size);
 
-                for (int i = 0; i < 3; i++) {
+                for (int i = 0; i < 100; i++) {
                     System.out.printf("Resolving collision between %s and %s\n", c.a, c.b);
                     var collision = findBestCollisionPointIn(c.a, c.b, collisions.get(c));
                     System.out.printf("Found collision point %s\n", collision);

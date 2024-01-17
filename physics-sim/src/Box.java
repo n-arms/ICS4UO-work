@@ -41,6 +41,24 @@ public class Box extends Particle {
     }
 
     @Override
+    public Vector2 normal(Vector2 point) {
+        Vector2 relativePoint = point.sub(position);
+        if (Math.abs(relativePoint.getX()) > Math.abs(relativePoint.getY())) {
+            if (relativePoint.getX() > 0) {
+                return new Vector2(1, 0);
+            } else {
+                return new Vector2(-1, 0);
+            }
+        } else {
+            if (relativePoint.getY() > 0) {
+                return new Vector2(0, 1);
+            } else {
+                return new Vector2(0, -1);
+            }
+        }
+    }
+
+    @Override
     public void writeToCSV(Writer writer) throws IOException {
         super.writeToCSV(writer);
         writer.write(",box");
