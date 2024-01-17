@@ -5,14 +5,14 @@ import java.util.function.Function;
 public class Box extends Particle {
     private final double radius;
 
-    public Box(Vector2 position, Vector2 velocity, double mass, int identifier, double elasticity) {
+    public Box(Vector2D position, Vector2D velocity, double mass, int identifier, double elasticity) {
         super(position, identifier, mass, elasticity);
         this.velocity = velocity;
         radius = Math.sqrt(mass) / 2;
     }
 
     @Override
-    public void collide(SegmentedWorld world) {
+    public void collide(CollisionManager world) {
         int left = world.toGridFloor(position.getX() - radius);
         int right = world.toGridCeil(position.getX() + radius);
         int top = world.toGridCeil(position.getY() + radius);
@@ -26,34 +26,34 @@ public class Box extends Particle {
     }
 
     @Override
-    public void render(Canvas c, Function<Vector2, Vector2> vectorTransform, Function<Double, Double> scalarTransform) {
-        Vector2 canvasPos = vectorTransform.apply(position);
+    public void render(Canvas c, Function<Vector2D, Vector2D> vectorTransform, Function<Double, Double> scalarTransform) {
+        Vector2D canvasPos = vectorTransform.apply(position);
         int canvasRadius = scalarTransform.apply(radius).intValue();
         c.drawRectangle((int) canvasPos.getX() - canvasRadius, (int) canvasPos.getY() - canvasRadius, 2 * canvasRadius, 2 * canvasRadius, color);
     }
 
     @Override
-    public double distance(Vector2 point) {
-        Vector2 relativePoint = point.sub(position).abs();
-        Vector2 radiusVector = new Vector2(radius, radius);
+    public double distance(Vector2D point) {
+        Vector2D relativePoint = point.sub(position).abs();
+        Vector2D radiusVector = new Vector2D(radius, radius);
 
-        return relativePoint.sub(radiusVector).max(new Vector2()).magnitude();
+        return relativePoint.sub(radiusVector).max(new Vector2D()).magnitude();
     }
 
     @Override
-    public Vector2 normal(Vector2 point) {
-        Vector2 relativePoint = point.sub(position);
+    public Vector2D normal(Vector2D point) {
+        Vector2D relativePoint = point.sub(position);
         if (Math.abs(relativePoint.getX()) > Math.abs(relativePoint.getY())) {
             if (relativePoint.getX() > 0) {
-                return new Vector2(1, 0);
+                return new Vector2D(1, 0);
             } else {
-                return new Vector2(-1, 0);
+                return new Vector2D(-1, 0);
             }
         } else {
             if (relativePoint.getY() > 0) {
-                return new Vector2(0, 1);
+                return new Vector2D(0, 1);
             } else {
-                return new Vector2(0, -1);
+                return new Vector2D(0, -1);
             }
         }
     }

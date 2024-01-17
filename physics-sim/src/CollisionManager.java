@@ -1,24 +1,19 @@
 
 import java.util.*;
-import java.util.function.Function;
 
-public class SegmentedWorld {
+public class CollisionManager {
     private final double size;
     private final int gridsPerSide;
 
     record GridPosition(int row, int col) {}
     private final HashMap<GridPosition, ArrayList<Particle>> grid;
-    public SegmentedWorld(double size, int gridsPerSide) {
+    public CollisionManager(double size, int gridsPerSide) {
         this.size = size;
         this.gridsPerSide = gridsPerSide;
         grid = new HashMap<>();
     }
 
-    public int getGridsPerSide() {
-        return gridsPerSide;
-    }
-
-    public double getGridSize() {
+    private double getGridSize() {
         return size / gridsPerSide;
     }
 
@@ -39,22 +34,22 @@ public class SegmentedWorld {
         return (int) Math.ceil(coord / getGridSize());
     }
 
-    public double fromGrid(int coord) {
+    private double fromGrid(int coord) {
         return coord * getGridSize();
     }
 
-    public Vector2 randomPoint(int row, int col) {
+    private Vector2D randomPoint(int row, int col) {
         double gridSize = getGridSize();
         double x = col * gridSize + Math.random() * gridSize;
         double y = row * gridSize + Math.random() * gridSize;
 
-        return new Vector2(x, y);
+        return new Vector2D(x, y);
     }
 
-    private Optional<Vector2> bestCollisionPoint(Particle a, Particle b, int rowNum, int colNum) {
-        ArrayList<Vector2> collisions = new ArrayList<>();
+    private Optional<Vector2D> bestCollisionPoint(Particle a, Particle b, int gridRow, int gridCol) {
+        ArrayList<Vector2D> collisions = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
-            Vector2 point = randomPoint(rowNum, colNum);
+            Vector2D point = randomPoint(gridRow, gridCol);
 
             if (a.distance(point) <= 0 && b.distance(point) <= 0) {
                 collisions.add(point);
@@ -102,11 +97,11 @@ public class SegmentedWorld {
         }
     }
 
-    private Optional<Vector2> findBestCollisionPointIn(Particle a, Particle b, HashSet<GridPosition> grids) {
-        ArrayList<Vector2> collisions = new ArrayList<>();
+    private Optional<Vector2D> findBestCollisionPointIn(Particle a, Particle b, HashSet<GridPosition> grids) {
+        ArrayList<Vector2D> collisions = new ArrayList<>();
         for (GridPosition grid : grids) {
             for (int i = 0; i < 100; i++) {
-                Vector2 point = randomPoint(grid.row, grid.col);
+                Vector2D point = randomPoint(grid.row, grid.col);
 
                 if (a.distance(point) <= 0 && b.distance(point) <= 0) {
                     collisions.add(point);
@@ -161,11 +156,11 @@ public class SegmentedWorld {
 
         for (Particle p : edgeCollisions.keySet()) {
             for (Edge e : edgeCollisions.get(p)) {
-                Vector2 collision = switch (e) {
-                    case LEFT -> new Vector2(0, p.getPosition().getY());
-                    case RIGHT -> new Vector2(fromGrid(gridsPerSide), p.getPosition().getY());
-                    case TOP -> new Vector2(p.getPosition().getX(), fromGrid(gridsPerSide));
-                    case BOTTOM -> new Vector2(p.getPosition().getX(), 0);
+                Vector2D collision = switch (e) {
+                    case LEFT -> new Vector2D(0, p.getPosition().getY());
+                    case RIGHT -> new Vector2D(fromGrid(gridsPerSide), p.getPosition().getY());
+                    case TOP -> new Vector2D(p.getPosition().getX(), fromGrid(gridsPerSide));
+                    case BOTTOM -> new Vector2D(p.getPosition().getX(), 0);
                 };
                 p.collisionForce(collision, size);
             }

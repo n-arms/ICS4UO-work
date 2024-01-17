@@ -1,11 +1,8 @@
 import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class Menu {
     private static Scanner reader = new Scanner(System.in);
@@ -51,24 +48,24 @@ public class Menu {
         });
     }
 
-    private static Vector2 getPosition() {
+    private static Vector2D getPosition() {
         double min = simulation.minCoord();
         double max = simulation.maxCoord();
 
         double x = getCoord("x", min, max);
         double y = getCoord("y", min, max);
 
-        return new Vector2(x, y);
+        return new Vector2D(x, y);
     }
 
-    private static Vector2 getVelocity() {
+    private static Vector2D getVelocity() {
         double min = Double.NEGATIVE_INFINITY;
         double max = Double.POSITIVE_INFINITY;
 
         double x = getCoord("x", min, max);
         double y = getCoord("y", min, max);
 
-        return new Vector2(x, y);
+        return new Vector2D(x, y);
     }
 
     private static double getMass() {
@@ -182,22 +179,22 @@ public class Menu {
 
     public static void addParticle() {
         simulation.showGrid(true);
-        double min = simulation.minGrid();
-        double max = simulation.maxGrid();
+        double min = simulation.minCoord();
+        double max = simulation.maxCoord();
         System.out.printf("Enter all coordinates from the bottom left, starting at %f and going to %f\n", min, max);
 
-        Vector2 position = getPosition();
+        Vector2D position = getPosition();
         double mass = getMass();
         double elasticity = getElasticity();
 
         System.out.println("Particle types:");
-        System.out.println("0) Circle");
-        System.out.println("1) Circle");
+        System.out.println("0) Disk");
+        System.out.println("1) Box");
 
         Particle particle;
         switch (getOption("Enter the particle type: ", 0, 1)) {
-            case 0 -> particle = new Disk(position, new Vector2(), mass, simulation.getNewIdentifier(), elasticity);
-            case 1 -> particle = new Box(position, new Vector2(), mass, simulation.getNewIdentifier(), elasticity);
+            case 0 -> particle = new Disk(position, new Vector2D(), mass, simulation.getNewIdentifier(), elasticity);
+            case 1 -> particle = new Box(position, new Vector2D(), mass, simulation.getNewIdentifier(), elasticity);
             default -> throw new IllegalArgumentException("The user should only have been able to enter valid options");
         }
 
@@ -244,11 +241,11 @@ public class Menu {
 
         switch (getOption("Enter an option: ", 0, 3)) {
             case 1 -> {
-                Vector2 position = getPosition();
+                Vector2D position = getPosition();
                 particle.setPosition(position);
             }
             case 2 -> {
-                Vector2 velocity = getVelocity();
+                Vector2D velocity = getVelocity();
                 particle.setVelocity(velocity);
             }
             case 3 -> {
