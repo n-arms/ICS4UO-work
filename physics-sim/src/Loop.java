@@ -1,11 +1,10 @@
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.function.Function;
 
 public class Loop {
     private final Canvas canvas;
-    private final int targetMillisPerFrame = 20;
+    private final int TARGET_MILLIS_PER_FRAME = 20;
+    private final int MILLIS_PER_SECOND = 1000;
     private long lastUpdate;
     private final Simulation simulation;
 
@@ -23,7 +22,7 @@ public class Loop {
      * Update the loop's simulation as if the target number of milliseconds per frame has elapsed.
      */
     private void update() {
-        simulation.update(targetMillisPerFrame / 1000.0, canvas);
+        simulation.update(TARGET_MILLIS_PER_FRAME / (double) MILLIS_PER_SECOND, canvas);
     }
 
     /**
@@ -35,7 +34,7 @@ public class Loop {
         long dt = now - lastUpdate;
 
         try {
-            Thread.sleep(targetMillisPerFrame - dt);
+            Thread.sleep(TARGET_MILLIS_PER_FRAME - dt);
         } catch (Exception e) {}
 
         lastUpdate = System.currentTimeMillis();

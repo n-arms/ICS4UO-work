@@ -29,6 +29,9 @@ public class CollisionManager {
     private final int gridsPerSide;
     private final HashMap<GridPosition, ArrayList<Particle>> grid;
 
+    private static final int POINT_SEARCHES_PER_GRID = 100;
+    private static final int REMOVE_ATTEMPTS = 100;
+
     /**
      * Construct a new collision manager with the given size and number of grids.
      * @param size the size of the collision manager in in-world units
@@ -141,7 +144,7 @@ public class CollisionManager {
     private Optional<Vector2D> findBestCollisionPointIn(Particle a, Particle b, HashSet<GridPosition> grids) {
         ArrayList<Vector2D> collisions = new ArrayList<>();
         for (GridPosition grid : grids) {
-            for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < POINT_SEARCHES_PER_GRID; i++) {
                 Vector2D point = randomPoint(grid.row, grid.col);
 
                 if (a.distance(point) <= 0 && b.distance(point) <= 0) {
@@ -233,7 +236,7 @@ public class CollisionManager {
                 c.a.collisionForce(point, size);
                 c.b.collisionForce(point, size);
 
-                for (int i = 0; i < 100; i++) {
+                for (int i = 0; i < REMOVE_ATTEMPTS; i++) {
                     System.out.printf("Resolving collision between %s and %s\n", c.a, c.b);
                     var collision = findBestCollisionPointIn(c.a, c.b, collisions.get(c));
                     System.out.printf("Found collision point %s\n", collision);

@@ -10,6 +10,7 @@ public class Simulation {
     public final CollisionManager collisions;
     private boolean showGrid = false;
     private int unusedIdentifier = 0;
+    private static final int GRIDS_PER_SIDE = 20;
 
     /**
      * Construct a new simulation.
@@ -19,7 +20,7 @@ public class Simulation {
     public Simulation(ArrayList<Particle> particles, double size) {
         this.particles = particles;
         this.size = size;
-        this.collisions = new CollisionManager(size, 20);
+        this.collisions = new CollisionManager(size, GRIDS_PER_SIDE);
     }
 
     /**

@@ -13,6 +13,9 @@ public abstract class Particle {
     protected int identifier;
     protected double mass;
     protected double elasticity;
+    private static final int ITERATIONS_PER_UPDATE = 1000;
+    private static final double VELOCITY_EPSILON = 0.00001;
+    private static final double VELOCITY_MOVE_FACTOR = 0.001;
 
     /**
      * Construct a new particle with the given position, identifier, mass, and elasticity.
@@ -34,9 +37,9 @@ public abstract class Particle {
      * @param dt the elapsed time, in seconds
      */
     public void update(double dt) {
-        for (int i = 0; i < 1000; i++) {
-            velocity.addEquals(acceleration.scale(dt / 1000));
-            position.addEquals(velocity.scale(dt / 1000));
+        for (int i = 0; i < ITERATIONS_PER_UPDATE; i++) {
+            velocity.addEquals(acceleration.scale(dt / ITERATIONS_PER_UPDATE));
+            position.addEquals(velocity.scale(dt / ITERATIONS_PER_UPDATE));
         }
 
         acceleration = new Vector2D(0, 0);
@@ -141,9 +144,9 @@ public abstract class Particle {
         Vector2D immediateVelocity = normal(point).scale(-1);
         boolean goingRight = immediateVelocity.getX() > 0;
         boolean goingUp = immediateVelocity.getY() > 0;
-        if (immediateVelocity.magnitude() > 0.00001) {
+        if (immediateVelocity.magnitude() > VELOCITY_EPSILON) {
             while (distance(point) <= 0) {
-                Vector2D newPosition = position.add(immediateVelocity.scale(0.001));
+                Vector2D newPosition = position.add(immediateVelocity.scale(VELOCITY_MOVE_FACTOR));
                 if (newPosition.getX() < 0 && !goingRight) {
                     throw new RuntimeException("Clipped left");
                 } else if (newPosition.getX() > size && goingRight) {
