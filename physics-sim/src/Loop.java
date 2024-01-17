@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.function.Function;
 
 public class Loop {
-    private final Canvas canvas = new Canvas();
+    private final Canvas canvas;
     private final int targetMillisPerFrame = 20;
     private long lastUpdate;
     private final Simulation simulation;
@@ -13,8 +13,9 @@ public class Loop {
      * Construct a new loop around the given simulation.
      * @param simulation the simulation to run
      */
-    public Loop(Simulation simulation) {
+    public Loop(Simulation simulation, int canvasSize) {
         lastUpdate = System.currentTimeMillis();
+        canvas = new Canvas(canvasSize);
         this.simulation = simulation;
     }
 

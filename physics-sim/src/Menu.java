@@ -101,7 +101,7 @@ public class Menu {
     public static void topLevel() {
         if (simulation == null) {
             loadSimulation();
-            loop = new Loop(simulation);
+            loop = new Loop(simulation, 600);
             EventQueue.invokeLater(loop::start);
         }
         boolean isFinished = false;
